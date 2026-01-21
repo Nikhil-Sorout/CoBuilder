@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import { connectDatabase } from './config/dbconfig';
 import authRoutes from './routes/auth';
 import cors from "cors";
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,10 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Parse and attach cookies to requests
+app.use(cookieParser());
+
 // Cors configuration
 // app.options("*", cors());
 app.use(

@@ -235,7 +235,7 @@ export const Sizes = {
   // Platform-specific adjustments
   ...Platform.select({
     web: {
-      maxContentWidth: 1200,
+      maxContentWidth: 1400,
       containerPadding: 24,
     },
     android: {
