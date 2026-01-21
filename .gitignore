@@ -1,0 +1,106 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.env.test
+.env.test.local
+.env*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+web-build/
+
+# Logs
+*.log
+npm-debug.log*
+npm-debug.*
+yarn-debug.log*
+yarn-debug.*
+yarn-error.log*
+yarn-error.*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+*.pem
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Expo
+.expo/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.keystore
+*.mobileprovision
+/ios
+/android
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+
+# Metro
+.metro-health-check*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+.jest/
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Secrets and credentials (additional patterns)
+secrets.json
+credentials.json
+*.secret
+*.credentials
+config.local.*
+*-secret.*
+*-credentials.*
+
+# Project specific
+app-example
