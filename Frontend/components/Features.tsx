@@ -3,6 +3,10 @@ import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Platform, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
+interface FeaturesProps{
+  setSectionPosition: (section: string, pos: number) => void;
+}
+
 interface FeatureCardProps {
   headline: string;
   description: string;
@@ -71,7 +75,7 @@ function FeatureCard({ headline, description, colors, cardWidth }: FeatureCardPr
   );
 }
 
-export default function Features() {
+export default function Features({setSectionPosition}: FeaturesProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
   const { width } = useWindowDimensions();
@@ -123,6 +127,7 @@ export default function Features() {
 
   return (
     <View
+      onLayout={(event) => setSectionPosition("Features", event.nativeEvent.layout.y)}
       style={[
         styles.featuresSection,
         {

@@ -4,7 +4,11 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { router } from "expo-router";
 import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
-export default function Navbar() {
+interface NavBarProps{
+  scrollToSection: (section: string) => void;
+}
+
+export default function Navbar({scrollToSection}: NavBarProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
   const isWeb = PlatformUtils.isWeb;
@@ -12,7 +16,9 @@ export default function Navbar() {
   const showCenterNav = isWeb && width >= 750;
 
   const handleLogoPress = () => {
-    router.push("/");
+    // router.push("/home");
+    // console.log("Navbar logo pressed");
+    scrollToSection("Hero");
   };
 
   const handleLoginPress = () => {
@@ -21,12 +27,17 @@ export default function Navbar() {
 
   const handleGenerateCoursePress = () => {
     // Will add scroll functionality later
+    scrollToSection("FinalCTA");
     console.log("Generate Course clicked");
   };
 
   const handleNavItemPress = (item: string) => {
     // Will add scroll functionality later
-    console.log(`${item} clicked`);
+    if(item.toLowerCase() === "product"){
+      item = "Features";
+    }
+    scrollToSection(item.replace(/\s+/g, ''));
+    console.log(`${item.replace(/\s+/g, '')} clicked`);
   };
 
   return (
@@ -64,21 +75,21 @@ export default function Navbar() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => handleNavItemPress("How it Works")}
+              onPress={() => handleNavItemPress("How It Works")}
               style={styles.navItem}
               activeOpacity={0.7}
             >
               <Text style={[styles.navItemText, { color: colors.textSecondary }]}>
-                How it Works
+                How It Works
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => handleNavItemPress("Pricing")}
+              onPress={() => handleNavItemPress("Try It Yourself")}
               style={styles.navItem}
               activeOpacity={0.7}
             >
               <Text style={[styles.navItemText, { color: colors.textSecondary }]}>
-                Pricing
+                Try It Yourself
               </Text>
             </TouchableOpacity>
           </View>
@@ -92,10 +103,10 @@ export default function Navbar() {
             activeOpacity={0.7}
           >
             <Text style={[styles.loginText, { color: colors.textPrimary }]}>
-              Login
+              Sign Up
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={handleGenerateCoursePress}
             style={[
               styles.ctaButton,
@@ -108,7 +119,7 @@ export default function Navbar() {
             <Text style={[styles.ctaText, { color: colors.textInverse }]}>
               Generate Course
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>

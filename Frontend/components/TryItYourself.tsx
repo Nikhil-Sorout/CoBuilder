@@ -4,6 +4,10 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, Animated, ActivityIndicator } from "react-native";
 import { useState, useEffect, useRef } from "react";
 
+interface TryItYourselfProps{
+  setSectionPosition: (section: string, pos: number) => void;
+}
+
 const PLACEHOLDER_EXAMPLES = [
   "DSA for FAANG interviews",
   "Machine learning for finance",
@@ -27,7 +31,7 @@ const GENERIC_MODULES = [
   },
 ];
 
-export default function TryItYourself() {
+export default function TryItYourself({setSectionPosition}: TryItYourselfProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
   
@@ -112,6 +116,7 @@ export default function TryItYourself() {
 
   return (
     <View
+      onLayout={(event) => setSectionPosition("TryItYourself", event.nativeEvent.layout.y)}
       style={[
         styles.section,
         {

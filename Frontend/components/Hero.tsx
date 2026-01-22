@@ -3,22 +3,31 @@ import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function Hero() {
+interface HeroProps{
+  setSectionPosition: (section: string, pos: number) => void;
+  scrollToSection: (section: string) => void;
+}
+
+
+export default function Hero({setSectionPosition, scrollToSection}: HeroProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
 
   const handleGenerateCoursePress = () => {
     // Will add behavior later
+    scrollToSection("FinalCTA");
     console.log("Generate My Course clicked");
   };
 
   const handleSeeHowItWorksPress = () => {
     // Will add scroll behavior later
+    scrollToSection("HowItWorks");
     console.log("See how it works clicked");
   };
 
   return (
     <View
+      onLayout={(event) => setSectionPosition("Hero", event.nativeEvent.layout.y)}
       style={[
         styles.hero,
         {

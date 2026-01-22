@@ -3,21 +3,21 @@ import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
-interface DashboardPreviewProps{
+interface RegenerationFeatureProps{
   setSectionPosition: (section: string, pos: number) => void;
 }
 
-export default function DashboardPreview({setSectionPosition}: DashboardPreviewProps) {
+export default function RegenerationFeature({setSectionPosition}: RegenerationFeatureProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
 
   return (
     <View
-      onLayout={(event) => setSectionPosition("DashboardPreview", event.nativeEvent.layout.y)}
+      onLayout={(event) => setSectionPosition("regenerationFeature", event.nativeEvent.layout.y)}
       style={[
         styles.section,
         {
-          backgroundColor: colors.background,
+          backgroundColor: colors.surface,
         },
       ]}
     >
@@ -33,7 +33,7 @@ export default function DashboardPreview({setSectionPosition}: DashboardPreviewP
                 },
               ]}
             >
-              See your learning progress at a glance
+              Refine any part of your course, instantly
             </Text>
             <Text
               style={[
@@ -43,15 +43,15 @@ export default function DashboardPreview({setSectionPosition}: DashboardPreviewP
                 },
               ]}
             >
-              Track your courses, monitor your progress, and stay consistent with your learning goals. Everything you need in one clear, organized view.
+              Courses don&apos;t always fit your exact needs. Adjust any module with a simple instruction—no need to start over or accept what doesn&apos;t work for you.
             </Text>
           </View>
 
-          {/* Right Side - Dashboard Visual */}
+          {/* Right Side - Regeneration Flow Visual */}
           <View style={styles.rightColumn}>
             <View
               style={[
-                styles.dashboardVisual,
+                styles.flowVisual,
                 {
                   backgroundColor: colors.surfaceElevated,
                   borderColor: colors.borderLight,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         minWidth: (Sizes.maxContentWidth || 1400) * 0.2,
-        flexBasis: "40%"
+        flexBasis: "40%",
       },
       default: {
         width: "100%",
@@ -162,14 +162,14 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         flexBasis: "50%",
-        minWidth: (Sizes.maxContentWidth || 1400) * 0.20,
+        minWidth: (Sizes.maxContentWidth || 1400) * 0.2,
       },
       default: {
         width: "100%",
       },
     }),
   },
-  dashboardVisual: {
+  flowVisual: {
     width: "100%",
     aspectRatio: Platform.select({
       web: 4 / 3,

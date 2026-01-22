@@ -3,23 +3,31 @@ import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Platform, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-interface HowItWorksProps{
+interface AudienceTypesProps{
   setSectionPosition: (section: string, pos: number) => void;
 }
 
-interface StepProps {
-  title: string;
-  description: string;
+interface AudienceCardProps {
+  label: string;
+  benefit: string;
   colors: ReturnType<typeof getAppColors>;
 }
 
-function Step({ title, description, colors }: StepProps) {
+function AudienceCard({ label, benefit, colors }: AudienceCardProps) {
   return (
-    <View style={styles.step}>
-      {/* Visual / Icon Placeholder */}
+    <View
+      style={[
+        styles.audienceCard,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.borderLight,
+        },
+      ]}
+    >
+      {/* Icon / Illustration Placeholder */}
       <View
         style={[
-          styles.stepVisual,
+          styles.iconPlaceholder,
           {
             backgroundColor: colors.surfaceElevated,
             borderColor: colors.borderLight,
@@ -28,69 +36,78 @@ function Step({ title, description, colors }: StepProps) {
       >
         <Text
           style={[
-            styles.stepVisualText,
+            styles.iconPlaceholderText,
             {
               color: colors.textTertiary,
             },
           ]}
         >
-          Visual
+          Icon
         </Text>
       </View>
 
-      {/* Step Content */}
-      <View style={styles.stepContent}>
-        <Text
-          style={[
-            styles.stepTitle,
-            {
-              color: colors.textPrimary,
-            },
-          ]}
-        >
-          {title}
-        </Text>
-        <Text
-          style={[
-            styles.stepDescription,
-            {
-              color: colors.textSecondary,
-            },
-          ]}
-        >
-          {description}
-        </Text>
-      </View>
+      {/* Audience Label */}
+      <Text
+        style={[
+          styles.audienceLabel,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        {label}
+      </Text>
+
+      {/* Benefit Line */}
+      <Text
+        style={[
+          styles.benefitText,
+          {
+            color: colors.textSecondary,
+          },
+        ]}
+      >
+        {benefit}
+      </Text>
     </View>
   );
 }
 
-export default function HowItWorks({setSectionPosition}: HowItWorksProps) {
+const AUDIENCE_TYPES = [
+  {
+    label: "Students",
+    benefit: "Exam prep and structured learning with clear progress tracking",
+  },
+  {
+    label: "Job Switchers",
+    benefit: "Role-specific learning paths with practical, focused content",
+  },
+  {
+    label: "Developers",
+    benefit: "Deep dives into custom topics with iterative learning",
+  },
+  {
+    label: "Professionals Upskilling",
+    benefit: "Time-efficient, targeted learning with measurable progress",
+  },
+  {
+    label: "Self-Learners",
+    benefit: "Explore freely with full control and built-in motivation",
+  },
+];
+
+export default function AudienceTypes({setSectionPosition}: AudienceTypesProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
   const { width } = useWindowDimensions();
   const isDesktop = width >= Breakpoints.lg;
-
-  const steps = [
-    {
-      title: "Describe Your Goal",
-      description: "Simply explain what you want to learn. No planning required—just tell us your goal.",
-    },
-    {
-      title: "AI Builds the Course",
-      description: "Get a complete learning path with organized modules, chapters, and clear objectives.",
-    },
-    {
-      title: "Learn, Track, Regenerate",
-      description: "Track your progress, check off completed items, and regenerate any section as needed.",
-    },
-  ];
+  const isTablet = width >= Breakpoints.md && width < Breakpoints.lg;
 
   return (
     <View
-      onLayout={(event) => setSectionPosition("HowItWorks", event.nativeEvent.layout.y)}
+      onLayout={(event) => setSectionPosition("audienceTypes", event.nativeEvent.layout.y)}
       style={[
-        styles.howItWorksSection,
+        styles.section,
         {
           backgroundColor: colors.background,
         },
@@ -101,38 +118,45 @@ export default function HowItWorks({setSectionPosition}: HowItWorksProps) {
         <View style={styles.header}>
           <Text
             style={[
-              styles.sectionHeading,
+              styles.heading,
               {
                 color: colors.textPrimary,
               },
             ]}
           >
-            How it works
+            Built for all kinds of learners
           </Text>
           <Text
             style={[
-              styles.sectionSubheading,
+              styles.subheading,
               {
                 color: colors.textSecondary,
               },
             ]}
           >
-            Create a complete learning path in minutes
+            Whether you&apos;re starting out or upskilling, find your path forward
           </Text>
         </View>
 
-        {/* Steps */}
+        {/* Audience Cards Grid */}
         <View
           style={[
-            styles.stepsContainer,
-            isDesktop ? styles.stepsContainerDesktop : styles.stepsContainerMobile,
+            styles.cardsContainer,
+            isDesktop ? styles.cardsContainerDesktop : isTablet ? styles.cardsContainerTablet : styles.cardsContainerMobile,
           ]}
         >
-          {steps.map((step, index) => (
-            <View key={index} style={styles.stepWrapper}>
-              <Step
-                title={step.title}
-                description={step.description}
+          {AUDIENCE_TYPES.map((audience, index) => (
+            <View
+              key={index}
+              style={[
+                styles.cardWrapper,
+                isDesktop && styles.cardWrapperDesktop,
+                isTablet && styles.cardWrapperTablet,
+              ]}
+            >
+              <AudienceCard
+                label={audience.label}
+                benefit={audience.benefit}
                 colors={colors}
               />
             </View>
@@ -144,7 +168,7 @@ export default function HowItWorks({setSectionPosition}: HowItWorksProps) {
 }
 
 const styles = StyleSheet.create({
-  howItWorksSection: {
+  section: {
     width: "100%",
     ...Platform.select({
       web: {
@@ -172,14 +196,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...Platform.select({
       web: {
-        marginBottom: Spacing["4xl"],
+        marginBottom: Spacing["3xl"],
       },
       default: {
         marginBottom: Spacing["2xl"],
       },
     }),
   },
-  sectionHeading: {
+  heading: {
     fontFamily: Typography.h2.fontFamily,
     fontWeight: Typography.h2.fontWeight,
     letterSpacing: Typography.h2.letterSpacing,
@@ -196,14 +220,14 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  sectionSubheading: {
+  subheading: {
     fontFamily: Typography.body.fontFamily,
     fontWeight: Typography.body.fontWeight,
     letterSpacing: Typography.body.letterSpacing,
     textAlign: "center",
     ...Platform.select({
       web: {
-        maxWidth: (Sizes.maxContentWidth || 1400) * 0.5,
+        maxWidth: (Sizes.maxContentWidth || 1400) * 0.6,
         fontSize: Typography.body.fontSize,
         lineHeight: Typography.body.fontSize * 1.6,
       },
@@ -213,82 +237,78 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  stepsContainer: {
+  cardsContainer: {
     width: "100%",
   },
-  stepsContainerDesktop: {
+  cardsContainerDesktop: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
-    alignItems: "flex-start",
     gap: Spacing.xl,
   },
-  stepsContainerMobile: {
+  cardsContainerTablet: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: Spacing.lg,
+  },
+  cardsContainerMobile: {
     flexDirection: "column",
-    gap: Spacing["2xl"],
+    gap: Spacing.lg,
   },
-  stepWrapper: {
-    ...Platform.select({
-      web: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-      },
-      default: {
-        width: "100%",
-      },
-    }),
+  cardWrapper: {
+    width: "100%",
   },
-  step: {
+  cardWrapperDesktop: {
     flex: 1,
-    alignItems: "center",
-    ...Platform.select({
-      web: {
-        width: 350,
-      },
-      default: {
-        width: "100%",
-      },
-    }),
+    minWidth: (Sizes.maxContentWidth || 1400) * 0.25,
+    maxWidth: (Sizes.maxContentWidth || 1400) * 0.3,
   },
-  stepVisual: {
-    aspectRatio: 16 / 9,
+  cardWrapperTablet: {
+    flex: 1,
+    minWidth: (Sizes.maxContentWidth || 1400) * 0.35,
+    maxWidth: (Sizes.maxContentWidth || 1400) * 0.48,
+  },
+  audienceCard: {
+    width: "100%",
+    padding: Spacing.lg,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: Spacing.lg,
     ...Platform.select({
       web: {
         ...Shadows?.sm,
-        width: 300,
-        alignSelf: "center",
       },
       default: {
-        width: "100%",
+        ...Shadows?.sm,
       },
     }),
   },
-  stepVisualText: {
+  iconPlaceholder: {
+    width: Sizes.iconSize.xl,
+    height: Sizes.iconSize.xl,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: Spacing.md,
+  },
+  iconPlaceholderText: {
     fontFamily: Typography.caption.fontFamily,
     fontWeight: Typography.caption.fontWeight,
     fontSize: Typography.caption.fontSize,
     letterSpacing: Typography.caption.letterSpacing,
   },
-  stepContent: {
-    alignItems: "center",
-    width: "100%",
-  },
-  stepTitle: {
+  audienceLabel: {
     fontFamily: Typography.h4.fontFamily,
     fontWeight: Typography.h4.fontWeight,
     fontSize: Typography.h4.fontSize,
     lineHeight: Typography.h4.lineHeight,
     letterSpacing: Typography.h4.letterSpacing,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
     textAlign: "center",
   },
-  stepDescription: {
+  benefitText: {
     fontFamily: Typography.body.fontFamily,
     fontWeight: Typography.body.fontWeight,
     fontSize: Typography.body.fontSize,
@@ -297,10 +317,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     ...Platform.select({
       web: {
-        maxWidth: 280,
+        maxWidth: (Sizes.maxContentWidth || 1400) * 0.25,
       },
       default: {
-        maxWidth: "100%",
+        width: "100%",
       },
     }),
   },
