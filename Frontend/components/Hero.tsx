@@ -156,6 +156,8 @@ const styles = StyleSheet.create({
     }),
   },
   contentWrapper: {
+    flex: 1,
+    flexWrap: "wrap",
     ...Platform.select({
       web: {
         flexDirection: "row",
@@ -169,10 +171,10 @@ const styles = StyleSheet.create({
     }),
   },
   leftColumn: {
-    flex: 1,
     ...Platform.select({
       web: {
-        maxWidth: (Sizes.maxContentWidth || 1400) * 0.5, // 50% of max content width for optimal reading
+        minWidth: (Sizes.maxContentWidth || 1400) * 0.20,
+        flexBasis: "40%"
       },
       default: {
         width: "100%",
@@ -263,10 +265,10 @@ const styles = StyleSheet.create({
     }),
   },
   rightColumn: {
-    flex: 1,
     ...Platform.select({
       web: {
-        maxWidth: (Sizes.maxContentWidth || 1400) * 0.5, // 50% of max content width
+        minWidth: (Sizes.maxContentWidth || 1400) * 0.20,
+        flexBasis: "50%"
       },
       default: {
         width: "100%",

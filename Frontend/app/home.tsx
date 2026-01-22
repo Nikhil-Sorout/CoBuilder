@@ -1,7 +1,9 @@
+import DashboardPreview from "@/components/DashboardPreview";
 import Features from "@/components/Features";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import Navbar from "@/components/Navbar";
+import TryItYourself from "@/components/TryItYourself";
 import { Spacing } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -21,6 +23,8 @@ export default function Home() {
         <Hero />
         <Features />
         <HowItWorks />
+        <TryItYourself />
+        <DashboardPreview />
         <View style={styles.content}>
           {/* Additional content sections will go here */}
         </View>

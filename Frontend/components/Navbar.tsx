@@ -2,12 +2,14 @@ import { BorderRadius, PlatformUtils, Sizes, Spacing, Typography, ZIndex } from 
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { router } from "expo-router";
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 export default function Navbar() {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
   const isWeb = PlatformUtils.isWeb;
+  const { width } = useWindowDimensions();
+  const showCenterNav = isWeb && width >= 750;
 
   const handleLogoPress = () => {
     router.push("/");
@@ -49,8 +51,8 @@ export default function Navbar() {
           </Text>
         </TouchableOpacity>
 
-        {/* Center: Navigation items (Web only) */}
-        {isWeb && (
+        {/* Center: Navigation items (Web only, visible above 750px) */}
+        {showCenterNav && (
           <View style={styles.centerNav}>
             <TouchableOpacity
               onPress={() => handleNavItemPress("Product")}
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.md,
-    flexShrink: 0,
+    flexShrink: 1,
   },
   loginButton: {
     paddingVertical: Spacing.xs,
@@ -200,7 +202,7 @@ const styles = StyleSheet.create({
   },
   ctaButton: {
     paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.md,
     ...Platform.select({
       web: {

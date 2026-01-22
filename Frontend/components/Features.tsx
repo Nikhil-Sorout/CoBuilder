@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: Spacing.md,
-    justifyContent: "flex-start",
+    justifyContent: "center",
   },
   gridTablet: {
     flexDirection: "row",

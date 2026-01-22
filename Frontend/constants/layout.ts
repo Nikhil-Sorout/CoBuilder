@@ -194,12 +194,14 @@ export const Sizes = {
   
   // Common component heights
   buttonHeight: {
+    xs: scale(20),
     sm: scale(32),
     md: scale(44),
     lg: scale(56),
   },
   
   inputHeight: {
+    xs: scale(24),
     sm: scale(36),
     md: scale(44),
     lg: scale(52),
