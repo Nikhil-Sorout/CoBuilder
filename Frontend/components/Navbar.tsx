@@ -3,6 +3,7 @@ import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { router } from "expo-router";
 import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {useAuth} from '@/contexts/AuthContext';
 
 interface NavBarProps{
   scrollToSection: (section: string) => void;
@@ -14,7 +15,9 @@ export default function Navbar({scrollToSection}: NavBarProps) {
   const isWeb = PlatformUtils.isWeb;
   const { width } = useWindowDimensions();
   const showCenterNav = isWeb && width >= 750;
+  const {user} = useAuth();
 
+  console.log(user)
   const handleLogoPress = () => {
     // router.push("/home");
     // console.log("Navbar logo pressed");
@@ -26,9 +29,7 @@ export default function Navbar({scrollToSection}: NavBarProps) {
   };
 
   const handleGenerateCoursePress = () => {
-    // Will add scroll functionality later
-    scrollToSection("FinalCTA");
-    console.log("Generate Course clicked");
+    router.push("/generator");
   };
 
   const handleNavItemPress = (item: string) => {
@@ -103,7 +104,7 @@ export default function Navbar({scrollToSection}: NavBarProps) {
             activeOpacity={0.7}
           >
             <Text style={[styles.loginText, { color: colors.textPrimary }]}>
-              Sign Up
+              {user?.isLoggedIn ? "Logout" : "Sign Up"}
             </Text>
           </TouchableOpacity>
           {/* <TouchableOpacity

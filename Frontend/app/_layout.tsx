@@ -1,30 +1,37 @@
-import {DarkTheme, DefaultTheme, ThemeProvider} from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack, SplashScreen } from "expo-router";
-import {useColorScheme} from "@/hooks/use-color-scheme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useState, useEffect } from "react";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-
+function AppContent() {
   const colorScheme = useColorScheme();
-  
-  const [ready, setReady] = useState(false);
+  const { isInitialized } = useAuth();
+  const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
-    // Wait until systemScheme is resolved (not null/undefined)
-    if (colorScheme) {
-      setReady(true);
+    // Wait until both colorScheme and auth are initialized
+    if (colorScheme && isInitialized) {
+      setAppReady(true);
       SplashScreen.hideAsync();
     }
-  }, [colorScheme]);
+  }, [colorScheme, isInitialized]);
 
-  if (!ready) return null;
+  if (!appReady) return null;
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{headerShown: false}} />
+      <Stack screenOptions={{ headerShown: false }} />
     </ThemeProvider>
-  ) 
-  ;
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
 }

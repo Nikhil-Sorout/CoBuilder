@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { connectDatabase } from './config/dbconfig';
 import authRoutes from './routes/auth';
+import generationRoutes from './routes/generation'
 import cors from "cors";
 import cookieParser from 'cookie-parser';
 
@@ -39,6 +40,9 @@ app.get('/health', (req: Request, res: Response) => {
 
 // Auth routes
 app.use('/auth', authRoutes);
+
+// Generation routes
+app.use('/generation', generationRoutes);
 
 // Initialize server: Connect to database first, then start listening
 const startServer = async () => {

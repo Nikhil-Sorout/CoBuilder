@@ -1,8 +1,8 @@
-import { googleAuth } from "@/utils/api";
 import { loadGoogleIdentity } from "@/utils/loadGoogleIdentity";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
 import { Platform } from "react-native";
+import { useAuth } from '@/contexts/AuthContext';
 
 // TypeScript types for Google Identity Services
 declare global {
@@ -29,25 +29,26 @@ declare global {
 
 export default function GoogleSignInWeb() {
   const isLoadingRef = useRef(false);
-
+  const { googleAuth, isLoading: authLoading } = useAuth();
+  
   const handleCredential = useCallback(async (response: { credential: string }) => {
-    if (isLoadingRef.current) return; // Prevent multiple calls
+    if (isLoadingRef.current || authLoading) return; // Prevent multiple calls
     
     isLoadingRef.current = true;
     try {
-      const result = await googleAuth(response.credential);
-      console.log("Google auth successful:", result);
+      await googleAuth(response.credential);
+      console.log("Google auth successful");
       
       // Redirect to home page on success
       router.replace("/home");
     } catch (error: any) {
       console.error("Google authentication failed:", error);
-      // TODO: Show error message to user
+      // Show error message to user
       alert(error.message || "Failed to authenticate with Google");
     } finally {
       isLoadingRef.current = false;
     }
-  }, []);
+  }, [googleAuth, authLoading]);
 
   useEffect(() => {
     if (Platform.OS !== "web") return;

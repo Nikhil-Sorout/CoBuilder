@@ -39,7 +39,7 @@ export const authenticateToken = async (
 
     // If not in cookie, try to get from Authorization header (mobile)
     if (!token) {
-      const authHeader = req.headers.authorization;
+      const authHeader = req.headers?.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
         token = authHeader.substring(7); // Remove 'Bearer ' prefix
       }

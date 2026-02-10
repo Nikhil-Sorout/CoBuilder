@@ -1,7 +1,6 @@
 import { BorderRadius, PlatformUtils, Spacing, Typography } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { exchangeCode } from "@/utils/api";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -14,14 +13,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function VerifySuccess() {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
   const { code } = useLocalSearchParams<{ code: string }>();
+  const { exchangeCode, isLoading: authLoading } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isLoadingAuth = authLoading;
 
   useEffect(() => {
     if (!code) {
@@ -32,8 +34,8 @@ export default function VerifySuccess() {
 
     const handleCodeExchange = async () => {
       try {
-        const result = await exchangeCode(code);
-        console.log("Code exchange successful: ", result);
+        await exchangeCode(code);
+        console.log("Code exchange successful");
         
         // Redirect to home page on success
         router.replace("/home");
@@ -45,6 +47,7 @@ export default function VerifySuccess() {
     };
 
     handleCodeExchange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
   const handleBackToLogin = () => {
@@ -66,20 +69,20 @@ export default function VerifySuccess() {
           {/* Header */}
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>
-              {isLoading ? "Verifying Email" : error ? "Verification Failed" : "Email Verified"}
+              {(isLoading || isLoadingAuth) ? "Verifying Email" : error ? "Verification Failed" : "Email Verified"}
             </Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              {isLoading
+              {(isLoading || isLoadingAuth)
                 ? "Please wait while we verify your email..."
                 : error
-                ? "We couldn't verify your email address"
-                : "Your email has been successfully verified"}
+                  ? "We couldn't verify your email address"
+                  : "Your email has been successfully verified"}
             </Text>
           </View>
 
           {/* Content */}
           <View style={styles.form}>
-            {isLoading ? (
+            {(isLoading || isLoadingAuth) ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
                 <Text style={[styles.loadingText, { color: colors.textSecondary }]}>

@@ -2,7 +2,6 @@ import GoogleSignInWeb from "@/components/GoogleSignIn.web";
 import { PlatformUtils } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { signup } from "@/utils/api";
 import { validateAuthFields } from "@/utils/validation";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -17,11 +16,13 @@ import {
   View,
 } from "react-native";
 import { authStyles as styles } from "./auth.styles";
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function SignUp() {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
+  const { signup, googleAuth, isLoading: authLoading } = useAuth(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -31,8 +32,8 @@ export default function SignUp() {
     email?: string;
     password?: string;
   }>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const isLoading = authLoading;
 
   const handleUsernameChange = (text: string) => {
     setUsername(text);
@@ -68,17 +69,12 @@ export default function SignUp() {
       return;
     }
 
-    setIsLoading(true);
     setApiError(null);
     setValidationErrors({});
 
     try {
-      const response = await signup(username, email, password);
+      const emailSentSuccessfully = await signup(username, email, password);
       
-      // Check if the message indicates email was sent successfully
-      const emailSentSuccessfully = 
-        response.message.includes("check your email") ||
-        response.message.includes("verification email");
 
       // Navigate to verification screen
       router.push({
@@ -93,9 +89,6 @@ export default function SignUp() {
       if (error.status === 409) {
         // Conflict - email already exists
         setApiError(error.message || "User with this email already exists");
-        // setValidationErrors({
-        //   email: error.message || "User with this email already exists",
-        // });
       } else if (error.status === 400) {
         // Bad request - validation error from server
         setApiError(error.message || "Invalid input. Please check your details.");
@@ -111,14 +104,24 @@ export default function SignUp() {
         // Other errors (500, network, etc.)
         setApiError(error.message || "An error occurred. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Handle Google sign in logic here
-    console.log("Google sign in");
+  const handleGoogleSignIn = async () => {
+    // TODO: Implement mobile Google Sign-In
+    // For mobile platforms, you'll need to:
+    // 1. Use a library like @react-native-google-signin/google-signin or expo-auth-session
+    // 2. Get the ID token from the Google Sign-In response
+    // 3. Call googleAuth(idToken) from the auth context
+    // Example:
+    // try {
+    //   const { idToken } = await GoogleSignin.signIn();
+    //   await googleAuth(idToken);
+    //   router.replace("/home");
+    // } catch (error) {
+    //   console.error("Google sign in error:", error);
+    // }
+    console.log("Google sign in - mobile implementation needed");
   };
 
   return (

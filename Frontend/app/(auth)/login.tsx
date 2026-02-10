@@ -2,7 +2,6 @@ import GoogleSignInWeb from "@/components/GoogleSignIn.web";
 import { PlatformUtils } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { login } from "@/utils/api";
 import { validateAuthFields } from "@/utils/validation";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -17,10 +16,13 @@ import {
   View,
 } from "react-native";
 import { authStyles as styles } from "./auth.styles";
+import { useAuth } from '@/contexts/AuthContext';
+
 
 export default function Login() {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
+  const { login, googleAuth, isLoading: authLoading } = useAuth(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,8 +30,8 @@ export default function Login() {
     email?: string;
     password?: string;
   }>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const isLoading = authLoading;
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -58,13 +60,12 @@ export default function Login() {
       return;
     }
 
-    setIsLoading(true);
     setApiError(null);
     setValidationErrors({});
 
     try {
-      const response = await login(email, password);
-      console.log("Login successful:", response);
+      await login(email, password);
+      console.log("Login successful");
       
       // Redirect to home page on success
       router.replace("/home");
@@ -86,14 +87,24 @@ export default function Login() {
         // Other errors (500, network, etc.)
         setApiError(error.message || "An error occurred. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Handle Google sign in logic here
-    console.log("Google sign in");
+  const handleGoogleSignIn = async () => {
+    // TODO: Implement mobile Google Sign-In
+    // For mobile platforms, you'll need to:
+    // 1. Use a library like @react-native-google-signin/google-signin or expo-auth-session
+    // 2. Get the ID token from the Google Sign-In response
+    // 3. Call googleAuth(idToken) from the auth context
+    // Example:
+    // try {
+    //   const { idToken } = await GoogleSignin.signIn();
+    //   await googleAuth(idToken);
+    //   router.replace("/home");
+    // } catch (error) {
+    //   console.error("Google sign in error:", error);
+    // }
+    console.log("Google sign in - mobile implementation needed");
   };
 
   return (

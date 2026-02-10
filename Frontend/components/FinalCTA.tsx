@@ -1,6 +1,7 @@
 import { BorderRadius, FontSizes, Shadows, Sizes, Spacing, Typography } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { router } from "expo-router";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface FinalCTAProps{
@@ -13,6 +14,7 @@ export default function FinalCTA({setSectionPosition}: FinalCTAProps) {
 
   const handleGenerateCourse = () => {
     // TODO: Navigate to course generation or sign up
+    router.push('/generator');
     console.log("Generate course clicked");
   };
 

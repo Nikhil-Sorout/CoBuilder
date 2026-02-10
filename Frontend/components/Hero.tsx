@@ -1,6 +1,7 @@
 import { BorderRadius, FontSizes, Shadows, Sizes, Spacing, Typography } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { router } from "expo-router";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface HeroProps{
@@ -15,7 +16,8 @@ export default function Hero({setSectionPosition, scrollToSection}: HeroProps) {
 
   const handleGenerateCoursePress = () => {
     // Will add behavior later
-    scrollToSection("FinalCTA");
+    router.push("/generator");
+    // scrollToSection("FinalCTA");
     console.log("Generate My Course clicked");
   };
 

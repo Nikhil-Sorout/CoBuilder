@@ -15,11 +15,54 @@ const apiClient = axios.create({
   withCredentials: Platform.OS === 'web', // Include cookies on web
 });
 
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+// Retry logic on unauthorized requests
+apiClient.interceptors.response.use(
+  response => response, // on fulfilled requests
+
+  // on rejected requests
+  async (error) => {
+    const originalRequest = error.config;
+
+    if(error.response?.status === 401 && !originalRequest._retry){
+      if(isRefreshing){
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject});
+        }).then(() => apiClient(originalRequest));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try{
+        // Only for web, mobile specific logic will be added later
+        await apiClient.post('/auth/refresh');
+        failedQueue.forEach(p => p.resolve());
+        failedQueue = [];
+
+        return apiClient(originalRequest);
+      } catch(refreshError){
+        failedQueue.forEach(p => p.reject(refreshError));
+        failedQueue = [];
+
+
+        return Promise.reject(refreshError);
+      } finally{
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+)
+
 // Signup response types
 export interface SignupResponse {
   message: string;
   user: {
-    id: number;
+    id: string;
     username: string;
     email: string;
     is_verified: boolean;
@@ -237,6 +280,100 @@ export const exchangeCode = async (
       }
     }
     // Unknown error
+    throw {
+      status: 500,
+      message: 'An unexpected error occurred',
+    };
+  }
+};
+
+// --- Course generation (backend: /generation/generateCourse) ---
+
+/** Request body for generateCourse (snake_case for backend) */
+export interface GenerateCourseRequest {
+  topic: string;
+  options?: {
+    skill_level?: string;
+    time_commitment?: string;
+    learning_goal?: string;
+  };
+}
+
+/** Lesson from backend */
+export interface ApiLesson {
+  id: string;
+  title: string;
+  order: number;
+  generation_status: string;
+  content: string | null;
+}
+
+/** Chapter from backend */
+export interface ApiChapter {
+  id: string;
+  title: string;
+  order: number;
+  lessons: ApiLesson[];
+}
+
+/** Module from backend */
+export interface ApiModule {
+  id: string;
+  title: string;
+  order: number;
+  chapters: ApiChapter[];
+}
+
+/** Course from backend */
+export interface ApiCourseResponse {
+  id: string;
+  title: string;
+  topic: string;
+  skill_level: string;
+  learning_goal: string;
+  duration_type: string;
+  created_at: string;
+  modules: ApiModule[];
+}
+
+export interface GenerateCourseResponse {
+  course: ApiCourseResponse;
+}
+
+export interface GenerateCourseErrorResponse {
+  error: string;
+}
+
+/**
+ * Generate a course via backend AI.
+ * Uses longer timeout (90s). Sends topic and options (defaults applied on server if omitted).
+ */
+export const generateCourse = async (
+  topic: string,
+  options?: { skill_level?: string; time_commitment?: string; learning_goal?: string }
+): Promise<GenerateCourseResponse> => {
+  try {
+    const response = await apiClient.post<GenerateCourseResponse>(
+      '/generation/generateCourse',
+      { topic: topic.trim(), options: options ?? {} },
+      { timeout: 90000 }
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<GenerateCourseErrorResponse>;
+      if (axiosError.response) {
+        throw {
+          status: axiosError.response.status,
+          message: axiosError.response.data?.error || 'Failed to generate course',
+        };
+      } else if (axiosError.request) {
+        throw {
+          status: 0,
+          message: 'Network error. Please check your connection.',
+        };
+      }
+    }
     throw {
       status: 500,
       message: 'An unexpected error occurred',
