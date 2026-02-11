@@ -7,6 +7,8 @@
     "dev": "ts-node index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "worker": "ts-node worker/lessonWorker.ts",
+    "db:reset": "node scripts/reset-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

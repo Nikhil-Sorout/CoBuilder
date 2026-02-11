@@ -6,13 +6,13 @@ import { Breakpoints, PlatformUtils, Spacing } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { generateCourse as apiGenerateCourse } from "@/utils/api";
+import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   useWindowDimensions,
   ScrollView,
@@ -143,6 +143,11 @@ export default function GeneratorScreen() {
     }
   }, []);
 
+  const handleViewLesson = useCallback((lessonId: string) => {
+    // Dynamic lesson route: app/lesson/[id].tsx — use type assertion until typed routes include it
+    router.push(`/lesson/${lessonId}` as import("expo-router").Href);
+  }, []);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Simple top bar: back / home */}
@@ -212,6 +217,7 @@ export default function GeneratorScreen() {
             onSave={handleSave}
             onRegenerate={handleRegenerate}
             onEditPrompt={handleEditPrompt}
+            onViewLesson={handleViewLesson}
           />
         </View>
       </View>

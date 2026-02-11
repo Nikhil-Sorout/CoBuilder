@@ -8,7 +8,13 @@ const DURATION_LABELS: Record<string, string> = {
 };
 
 function mapLesson(les: ApiLesson): Lesson {
-  return { id: les.id, title: les.title };
+  return {
+    id: les.id,
+    title: les.title,
+    order: les.order ?? 0,
+    generation_status: (les.generation_status as Lesson["generation_status"]) || "pending",
+    // content not needed in list view; loaded on lesson screen when ready
+  };
 }
 
 function mapChapter(ch: ApiChapter): Chapter {

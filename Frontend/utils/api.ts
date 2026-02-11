@@ -299,13 +299,13 @@ export interface GenerateCourseRequest {
   };
 }
 
-/** Lesson from backend */
+/** Lesson from backend (list view: content often null until ready) */
 export interface ApiLesson {
   id: string;
   title: string;
   order: number;
   generation_status: string;
-  content: string | null;
+  content: Record<string, unknown> | null;
 }
 
 /** Chapter from backend */
@@ -343,6 +343,119 @@ export interface GenerateCourseResponse {
 export interface GenerateCourseErrorResponse {
   error: string;
 }
+
+// --- Lessons (GET /lessons/:id, GET /lessons/:id/versions) ---
+
+/** Response when lesson is still pending/generating (no content) */
+export interface GetLessonGeneratingResponse {
+  id: string;
+  chapter_id: string;
+  title: string;
+  order: number;
+  generation_status: 'pending' | 'generating';
+  status: 'generating';
+}
+
+/** Response when lesson is ready (with content) or when requesting ?version=N */
+export interface GetLessonReadyResponse {
+  id: string;
+  chapter_id: string;
+  title: string;
+  order: number;
+  generation_status: string;
+  content: Record<string, unknown>;
+  estimated_minutes?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type GetLessonResponse = GetLessonGeneratingResponse | GetLessonReadyResponse;
+
+export interface GetLessonErrorResponse {
+  error: string;
+}
+
+export interface LessonVersionItem {
+  version: number;
+  created_at: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface GetLessonVersionsResponse {
+  lesson_id: string;
+  versions: LessonVersionItem[];
+}
+
+/**
+ * Get a lesson by id. Optional version for older content.
+ * When status is pending/generating, response has status: 'generating' and no content.
+ */
+export const getLesson = async (
+  lessonId: string,
+  version?: number
+): Promise<GetLessonResponse> => {
+  try {
+    const params = version !== undefined ? { version } : {};
+    const response = await apiClient.get<GetLessonResponse>(
+      `/lessons/${lessonId}`,
+      { params, timeout: 10000 }
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<GetLessonErrorResponse>;
+      if (axiosError.response) {
+        throw {
+          status: axiosError.response.status,
+          message: axiosError.response.data?.error || 'Failed to load lesson',
+        };
+      } else if (axiosError.request) {
+        throw {
+          status: 0,
+          message: 'Network error. Please check your connection.',
+        };
+      }
+    }
+    throw {
+      status: 500,
+      message: 'An unexpected error occurred',
+    };
+  }
+};
+
+/**
+ * List content versions for a lesson (for "revisit older version" UI).
+ */
+export const getLessonVersions = async (
+  lessonId: string
+): Promise<GetLessonVersionsResponse> => {
+  try {
+    const response = await apiClient.get<GetLessonVersionsResponse>(
+      `/lessons/${lessonId}/versions`,
+      { timeout: 10000 }
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<GetLessonErrorResponse>;
+      if (axiosError.response) {
+        throw {
+          status: axiosError.response.status,
+          message: axiosError.response.data?.error || 'Failed to load versions',
+        };
+      } else if (axiosError.request) {
+        throw {
+          status: 0,
+          message: 'Network error. Please check your connection.',
+        };
+      }
+    }
+    throw {
+      status: 500,
+      message: 'An unexpected error occurred',
+    };
+  }
+};
 
 /**
  * Generate a course via backend AI.

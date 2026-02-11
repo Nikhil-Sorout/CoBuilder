@@ -6,7 +6,7 @@ import {
 } from "@/constants/layout";
 import { getAppColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import type { GeneratedCourse, Module as ModuleType } from "./types";
+import type { GeneratedCourse, Lesson as LessonType, Module as ModuleType } from "./types";
 import {
   ActivityIndicator,
   ScrollView,
@@ -45,16 +45,76 @@ interface CoursePreviewProps {
   onRegenerate?: () => void;
   /** Edit prompt (callback to focus / clear for new generation) */
   onEditPrompt?: () => void;
+  /** Navigate to lesson view when user taps "View" (only when generation_status === 'ready') */
+  onViewLesson?: (lessonId: string) => void;
+}
+
+function LessonRow({
+  lesson,
+  colors,
+  onViewLesson,
+}: {
+  lesson: LessonType;
+  colors: ReturnType<typeof getAppColors>;
+  onViewLesson?: (lessonId: string) => void;
+}) {
+  const status = lesson.generation_status;
+  const isReady = status === "ready";
+  const isPreparing = status === "pending" || status === "generating";
+  const isFailed = status === "failed";
+
+  const handlePress = () => {
+    if (isReady && onViewLesson) {
+      onViewLesson(lesson.id);
+    } else if (isPreparing) {
+      Alert.alert("Lesson not ready", "This lesson is still being prepared. Try again in a moment.");
+    } else if (isFailed) {
+      Alert.alert("Unavailable", "This lesson couldn't be generated.");
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      style={[styles.lessonRow, { borderBottomColor: colors.borderLight }]}
+      onPress={handlePress}
+      activeOpacity={0.7}
+    >
+      <Text
+        style={[styles.lessonTitle, { color: colors.textPrimary }]}
+        numberOfLines={1}
+      >
+        · {lesson.title}
+      </Text>
+      <View style={styles.lessonStatus}>
+        {isPreparing && (
+          <>
+            <ActivityIndicator size="small" color={colors.primary} style={styles.lessonSpinner} />
+            <Text style={[styles.lessonStatusText, { color: colors.textTertiary }]}>
+              Preparing…
+            </Text>
+          </>
+        )}
+        {isReady && (
+          <Text style={[styles.lessonViewText, { color: colors.primary }]}>View</Text>
+        )}
+        {isFailed && (
+          <Text style={[styles.lessonStatusText, { color: colors.error }]}>Unavailable</Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 function ExpandableModule({
   module: mod,
   index,
   colors,
+  onViewLesson,
 }: {
   module: ModuleType;
   index: number;
   colors: ReturnType<typeof getAppColors>;
+  onViewLesson?: (lessonId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -92,13 +152,13 @@ function ExpandableModule({
               <Text style={[styles.chapterTitle, { color: colors.textSecondary }]}>
                 {chIdx + 1}. {ch.title}
               </Text>
-              {ch.lessons.map((lesson, lIdx) => (
-                <Text
+              {ch.lessons.map((lesson) => (
+                <LessonRow
                   key={lesson.id}
-                  style={[styles.lessonTitle, { color: colors.textPrimary }]}
-                >
-                  · {lesson.title}
-                </Text>
+                  lesson={lesson}
+                  colors={colors}
+                  onViewLesson={onViewLesson}
+                />
               ))}
             </View>
           ))}
@@ -117,6 +177,7 @@ export default function CoursePreview({
   onSave,
   onRegenerate,
   onEditPrompt,
+  onViewLesson,
 }: CoursePreviewProps) {
   const colorScheme = useColorScheme();
   const colors = getAppColors(colorScheme);
@@ -207,6 +268,7 @@ export default function CoursePreview({
                 module={mod}
                 index={idx}
                 colors={colors}
+                onViewLesson={onViewLesson}
               />
             ))}
 
@@ -364,16 +426,41 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   chapterBlock: {
-    gap: 2,
+    gap: 0,
   },
   chapterTitle: {
     ...Typography.label,
     fontSize: FontSizes.sm,
+    marginBottom: Spacing.xs,
+  },
+  lessonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: Spacing.sm,
+    paddingLeft: Spacing.sm,
+    paddingRight: Spacing.xs,
+    borderBottomWidth: 1,
   },
   lessonTitle: {
     ...Typography.bodySmall,
     fontSize: FontSizes.sm,
-    paddingLeft: Spacing.sm,
+    flex: 1,
+  },
+  lessonStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  lessonSpinner: {
+    marginRight: 0,
+  },
+  lessonStatusText: {
+    ...Typography.captionSmall,
+  },
+  lessonViewText: {
+    ...Typography.button,
+    fontSize: FontSizes.sm,
   },
   actions: {
     marginTop: Spacing.lg,

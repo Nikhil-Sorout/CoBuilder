@@ -2,7 +2,8 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { connectDatabase } from './config/dbconfig';
 import authRoutes from './routes/auth';
-import generationRoutes from './routes/generation'
+import generationRoutes from './routes/generation';
+import lessonsRoutes from './routes/lessons';
 import cors from "cors";
 import cookieParser from 'cookie-parser';
 
@@ -43,6 +44,9 @@ app.use('/auth', authRoutes);
 
 // Generation routes
 app.use('/generation', generationRoutes);
+
+// Lesson (read + versions)
+app.use('/lessons', lessonsRoutes);
 
 // Initialize server: Connect to database first, then start listening
 const startServer = async () => {
